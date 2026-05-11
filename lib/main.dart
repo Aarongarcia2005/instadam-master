@@ -14,23 +14,69 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({super.key});
 
   @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late ThemeNotifier _themeNotifier;
+
+  @override
+  void initState() {
+    super.initState();
+    _initTheme();
+  }
+
+  Future<void> _initTheme() async {
+    final savedTheme = await PreferencesService.getThemeMode();
+    _themeNotifier = ThemeNotifier(savedTheme);
+    setState(() {});
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'InstaDAM',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const AuthWrapper(),
+    if (!mounted) return const SizedBox();
+    
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: _themeNotifier,
+      builder: (context, themeMode, _) {
+        return MaterialApp(
+          title: 'InstaDAM',
+          theme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.light,
+            primarySwatch: Colors.blue,
+            appBarTheme: const AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.white,
+              foregroundColor: Colors.black87,
+            ),
+          ),
+          darkTheme: ThemeData(
+            useMaterial3: true,
+            brightness: Brightness.dark,
+            primarySwatch: Colors.blue,
+            appBarTheme: AppBarTheme(
+              elevation: 0,
+              backgroundColor: Colors.grey[900],
+              foregroundColor: Colors.white,
+            ),
+          ),
+          themeMode: themeMode,
+          home: AuthWrapper(themeNotifier: _themeNotifier),
+        );
+      },
     );
   }
 }
 
 class AuthWrapper extends StatefulWidget {
-  const AuthWrapper({super.key});
+  final ThemeNotifier themeNotifier;
+
+  const AuthWrapper({super.key, required this.themeNotifier});
 
   @override
   State<AuthWrapper> createState() => _AuthWrapperState();
@@ -115,13 +161,16 @@ class _AuthWrapperState extends State<AuthWrapper> {
                 );
               }
               if (userSnapshot.data != null) {
-                return FeedScreen(username: userSnapshot.data!);
+                return FeedScreen(
+                  username: userSnapshot.data!,
+                  themeNotifier: widget.themeNotifier,
+                );
               }
-              return const LoginScreen();
+              return LoginScreen(themeNotifier: widget.themeNotifier);
             },
           );
         }
-        return const LoginScreen();
+        return LoginScreen(themeNotifier: widget.themeNotifier);
       },
     );
   }

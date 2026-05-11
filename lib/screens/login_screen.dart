@@ -5,7 +5,9 @@ import '../models/user.dart';
 import 'feed_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  final ThemeNotifier? themeNotifier;
+
+  const LoginScreen({super.key, this.themeNotifier});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -63,7 +65,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => FeedScreen(username: username)),
+        MaterialPageRoute(
+          builder: (context) => FeedScreen(
+            username: username,
+            themeNotifier: widget.themeNotifier ?? ThemeNotifier(ThemeMode.system),
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

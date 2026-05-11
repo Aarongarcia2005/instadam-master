@@ -5,11 +5,17 @@ import '../widgets/post_card.dart';
 import '../services/preferences_service.dart';
 import 'login_screen.dart';
 import 'create_post_screen.dart';
+import 'settings_screen.dart';
 
 class FeedScreen extends StatefulWidget {
   final String username;
+  final ThemeNotifier themeNotifier;
 
-  const FeedScreen({super.key, required this.username});
+  const FeedScreen({
+    super.key,
+    required this.username,
+    required this.themeNotifier,
+  });
 
   @override
   State<FeedScreen> createState() => _FeedScreenState();
@@ -90,6 +96,19 @@ class _FeedScreenState extends State<FeedScreen> {
             icon: const Icon(Icons.add_circle_outline),
             tooltip: 'Crear nuevo post',
             onPressed: _navigateToCreatePost,
+          ),
+          IconButton(
+            icon: const Icon(Icons.settings),
+            tooltip: 'Ajustes',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => SettingsScreen(
+                    themeNotifier: widget.themeNotifier,
+                  ),
+                ),
+              );
+            },
           ),
         ],
       ),
