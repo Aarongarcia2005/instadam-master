@@ -176,6 +176,7 @@ class _FeedScreenState extends State<FeedScreen> {
       floatingActionButton: FloatingActionButton(
         onPressed: _navigateToCreatePost,
         backgroundColor: Colors.pink.shade500,
+        tooltip: 'Crear nuevo post',
         child: const Icon(Icons.add),
       ),
     );

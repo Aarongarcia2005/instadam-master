@@ -90,7 +90,7 @@ class _AuthWrapperState extends State<AuthWrapper> {
           });
         }
       } catch (e) {
-        print('Error inicializando datos de ejemplo: $e');
+        debugPrint('Error inicializando datos de ejemplo: $e');
       }
     }
   }

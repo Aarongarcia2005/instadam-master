@@ -49,6 +49,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Check user in database
     Map<String, dynamic>? userMap = await DBHelper().getUserByUsername(username);
+    if (!mounted) return;
+
     if (userMap != null && userMap['password'] == password) {
       // Login successful
       if (_rememberUser) {
@@ -58,6 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
         await PreferencesService.setRememberUser(false);
       }
 
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => FeedScreen(username: username)),
@@ -83,6 +86,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     // Check if user already exists
     Map<String, dynamic>? existingUser = await DBHelper().getUserByUsername(username);
+    if (!mounted) return;
+
     if (existingUser != null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('El usuario ya existe')),
@@ -93,6 +98,8 @@ class _LoginScreenState extends State<LoginScreen> {
     // Insert new user
     User newUser = User(username: username, password: password, email: email);
     int result = await DBHelper().insertUser(newUser.toMap());
+    if (!mounted) return;
+
     if (result > 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Registro exitoso. Por favor, inicia sesión.')),

@@ -87,7 +87,7 @@ class _PostCardState extends State<PostCard> {
       ),
     );
 
-    SemanticsService.announce(message, Directionality.of(context));
+    SemanticsService.sendAnnouncement(View.of(context), message, Directionality.of(context));
   }
 
   Future<void> _toggleLike() async {
@@ -112,7 +112,7 @@ class _PostCardState extends State<PostCard> {
         _announceLikeChange('Has dado Me gusta. Ahora hay $likeCount me gustas.');
       }
     } catch (e) {
-      print('Error al cambiar like: $e');
+      debugPrint('Error al cambiar like: $e');
     }
   }
 
@@ -148,193 +148,201 @@ class _PostCardState extends State<PostCard> {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(12),
       ),
-child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          MergeSemantics(
-            child: Semantics(
-              container: true,
-              readOnly: true,
-              label: postSummary,
-              child: ExcludeSemantics(
-                child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: MergeSemantics(
+        child: Semantics(
+          container: true,
+          label: postSummary,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              widget.post.username ?? 'Usuario',
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                              ),
-                            ),
-                            Text(
-                              _formatDate(widget.post.timestamp),
-                              style: TextStyle(
-                                color: Colors.grey[600],
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
+                        Text(
+                          widget.post.username ?? 'Usuario',
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                          ),
                         ),
-                        ExcludeSemantics(
-                          child: Icon(Icons.more_vert, color: Colors.grey[600]),
+                        Text(
+                          _formatDate(widget.post.timestamp),
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
                         ),
                       ],
                     ),
-                  ),
-                  Semantics(
-                    image: true,
-                    label: _getImageDescription(),
-                    child: ExcludeSemantics(
-                      child: Container(
-                        width: double.infinity,
-                        height: 300,
-                        color: Colors.grey[300],
-                        child: widget.post.imagePath != null &&
-                                widget.post.imagePath!.isNotEmpty
-                            ? Image.asset(
-                                widget.post.imagePath!,
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Center(
-                                    child: ExcludeSemantics(
-                                      child: Icon(
-                                        Icons.image_not_supported,
-                                        size: 80,
-                                        color: Colors.grey[400],
-                                      ),
-                                    ),
-                                  );
-                                },
-                              )
-                            : Center(
+                    ExcludeSemantics(
+                      child: Icon(Icons.more_vert, color: Colors.grey[600]),
+                    ),
+                  ],
+                ),
+              ),
+              Semantics(
+                image: true,
+                label: _getImageDescription(),
+                child: ExcludeSemantics(
+                  child: Container(
+                    width: double.infinity,
+                    height: 300,
+                    color: Colors.grey[300],
+                    child: widget.post.imagePath != null &&
+                            widget.post.imagePath!.isNotEmpty
+                        ? Image.asset(
+                            widget.post.imagePath!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Center(
                                 child: ExcludeSemantics(
                                   child: Icon(
                                     Icons.image_not_supported,
-                                        size: 80,
-                                        color: Colors.grey[400],
-                                      ),
+                                    size: 80,
+                                    color: Colors.grey[400],
+                                  ),
                                 ),
-                              ),
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(12),
-                    child: Text(
-                      widget.post.content,
-                      style: const TextStyle(
-                        fontSize: 14,
-                        height: 1.5,
-                      ),
-                    ),
-                  ),
-                ],
-                ),
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Semantics(
-                  button: true,
-                  toggled: isLiked,
-                  label: 'Me gusta',
-                  value: isLiked ? 'Activado. $likeCount me gustas' : 'Desactivado. $likeCount me gustas',
-                  hint: isLiked
-                      ? 'Doble toque para quitar Me gusta'
-                      : 'Doble toque para dar Me gusta',
-                  onTap: _toggleLike,
-                  child: ExcludeSemantics(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: _toggleLike,
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                isLiked ? Icons.favorite : Icons.favorite_border,
-                                color: isLiked ? Colors.red : Colors.grey[700],
-                                size: 22,
-                              ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '$likeCount',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Semantics(
-                  button: true,
-                  label: 'Comentarios',
-                  value: '$commentCount ${commentCount == 1 ? "comentario" : "comentarios"}',
-                  hint: 'Doble toque para abrir comentarios',
-                  child: ExcludeSemantics(
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) => CommentsScreen(
-                                post: widget.post,
-                                currentUsername: widget.currentUsername,
+                              );
+                            },
+                          )
+                        : Center(
+                            child: ExcludeSemantics(
+                              child: Icon(
+                                Icons.image_not_supported,
+                                size: 80,
+                                color: Colors.grey[400],
                               ),
                             ),
-                          );
-                        },
-                        borderRadius: BorderRadius.circular(8),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.comment_outlined,
-                                color: Colors.grey[700],
-                                size: 22,
+                          ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(12),
+                child: Text(
+                  widget.post.content.isEmpty ? 'Sin descripción' : widget.post.content,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    height: 1.5,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Semantics(
+                      button: true,
+                      toggled: isLiked,
+                      label: 'Me gusta',
+                      value: isLiked
+                          ? 'Activado. $likeCount me gustas'
+                          : 'Desactivado. $likeCount me gustas',
+                      hint: isLiked
+                          ? 'Doble toque para quitar Me gusta'
+                          : 'Doble toque para dar Me gusta',
+                      onTap: _toggleLike,
+                      child: ExcludeSemantics(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: _toggleLike,
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    isLiked ? Icons.favorite : Icons.favorite_border,
+                                    color: isLiked ? Colors.red : Colors.grey[700],
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '$likeCount',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                'Ver comentarios ($commentCount)',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[700],
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
+                    Semantics(
+                      button: true,
+                      label: 'Comentarios',
+                      value: '$commentCount ${commentCount == 1 ? "comentario" : "comentarios"}',
+                      hint: 'Doble toque para abrir comentarios',
+                      onTap: () {
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => CommentsScreen(
+                              post: widget.post,
+                              currentUsername: widget.currentUsername,
+                            ),
+                          ),
+                        );
+                      },
+                      child: ExcludeSemantics(
+                        child: Material(
+                          color: Colors.transparent,
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => CommentsScreen(
+                                    post: widget.post,
+                                    currentUsername: widget.currentUsername,
+                                  ),
+                                ),
+                              );
+                            },
+                            borderRadius: BorderRadius.circular(8),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.comment_outlined,
+                                    color: Colors.grey[700],
+                                    size: 22,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Ver comentarios ($commentCount)',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[700],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 8),
+            ],
           ),
-          const SizedBox(height: 8),
-        ],
+        ),
       ),
+    );
+  }
+}
+
