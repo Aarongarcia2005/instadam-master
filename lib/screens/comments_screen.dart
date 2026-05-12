@@ -3,6 +3,7 @@ import '../database/db_helper.dart';
 import '../models/comment.dart';
 import '../models/post.dart';
 import '../widgets/comment_tile.dart';
+import '../localization/app_localizations.dart';
 
 class CommentsScreen extends StatefulWidget {
   final Post post;
@@ -34,9 +35,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
   }
 
   Future<void> _submitComment() async {
+    final localization = AppLocalizations.of(context);
+    
     if (_commentController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Escribe un comentario')),
+        SnackBar(content: Text(localization.commentsHint)),
       );
       return;
     }
@@ -66,8 +69,14 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Comentario agregado')),
+          SnackBar(content: Text(localization.success)),
         );
+        // Cerrar la pantalla devolviendo true para indicar que se agregó un comentario
+        Future.delayed(const Duration(milliseconds: 300), () {
+          if (mounted) {
+            Navigator.pop(context, true);
+          }
+        });
       }
     } catch (e) {
       if (mounted) {
@@ -90,9 +99,11 @@ class _CommentsScreenState extends State<CommentsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+    
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Comentarios'),
+        title: Text(localization.commentsTitle),
         centerTitle: true,
         elevation: 0,
         flexibleSpace: Container(
@@ -109,7 +120,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: 'Volver',
+          tooltip: localization.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -265,7 +276,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     enabled: !_isSubmitting,
                     maxLines: null,
                     decoration: InputDecoration(
-                      hintText: 'Escribe un comentario...',
+                      hintText: localization.commentsHint,
                       hintStyle: TextStyle(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(24),
@@ -308,7 +319,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                             color: Colors.white,
                             size: 18,
                           ),
-                    tooltip: 'Enviar comentario',
+                    tooltip: localization.commentsSend,
                     onPressed: _isSubmitting ? null : _submitComment,
                   ),
                 ),

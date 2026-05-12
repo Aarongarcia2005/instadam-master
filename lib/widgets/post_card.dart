@@ -116,6 +116,20 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  Future<void> _updateCommentCount() async {
+    if (widget.post.id == null) return;
+    try {
+      final comments = await DBHelper().getCommentsByPostId(widget.post.id!);
+      if (mounted) {
+        setState(() {
+          commentCount = comments.length;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error al actualizar conteo de comentarios: $e');
+    }
+  }
+
   String _formatDate(String timestamp) {
     try {
       DateTime dateTime = DateTime.parse(timestamp);
@@ -284,8 +298,8 @@ class _PostCardState extends State<PostCard> {
                       label: 'Comentarios',
                       value: '$commentCount ${commentCount == 1 ? "comentario" : "comentarios"}',
                       hint: 'Doble toque para abrir comentarios',
-                      onTap: () {
-                        Navigator.of(context).push(
+                      onTap: () async {
+                        final result = await Navigator.of(context).push<bool>(
                           MaterialPageRoute(
                             builder: (context) => CommentsScreen(
                               post: widget.post,
@@ -293,13 +307,17 @@ class _PostCardState extends State<PostCard> {
                             ),
                           ),
                         );
+                        // Si se agregó un comentario, recargar el conteo
+                        if (result == true && mounted) {
+                          _updateCommentCount();
+                        }
                       },
                       child: ExcludeSemantics(
                         child: Material(
                           color: Colors.transparent,
                           child: InkWell(
-                            onTap: () {
-                              Navigator.of(context).push(
+                            onTap: () async {
+                              final result = await Navigator.of(context).push<bool>(
                                 MaterialPageRoute(
                                   builder: (context) => CommentsScreen(
                                     post: widget.post,
@@ -307,6 +325,10 @@ class _PostCardState extends State<PostCard> {
                                   ),
                                 ),
                               );
+                              // Si se agregó un comentario, recargar el conteo
+                              if (result == true && mounted) {
+                                _updateCommentCount();
+                              }
                             },
                             borderRadius: BorderRadius.circular(8),
                             child: Padding(

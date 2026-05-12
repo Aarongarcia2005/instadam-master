@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
 import 'package:sqflite_common_ffi_web/sqflite_ffi_web.dart';
 import 'screens/login_screen.dart';
@@ -58,6 +59,8 @@ class _MyAppState extends State<MyApp> {
             return MaterialApp(
               title: 'InstaDAM',
               localizationsDelegates: [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
                 AppLocalizationsDelegate(language: language),
               ],
               supportedLocales: const [
