@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import '../database/db_helper.dart';
+import '../localization/app_localizations.dart';
+import 'photo_picker_screen.dart';
 
 class CreatePostScreen extends StatefulWidget {
   final String username;
@@ -12,20 +15,21 @@ class CreatePostScreen extends StatefulWidget {
 
 class _CreatePostScreenState extends State<CreatePostScreen> {
   final TextEditingController _contentController = TextEditingController();
-  final TextEditingController _imageUrlController = TextEditingController();
+  String? _selectedPhotoPath;
   bool _isLoading = false;
 
   @override
   void dispose() {
     _contentController.dispose();
-    _imageUrlController.dispose();
     super.dispose();
   }
 
   Future<void> _createPost() async {
+    final localization = AppLocalizations.of(context);
+    
     if (_contentController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor escribe un contenido')),
+        SnackBar(content: Text(localization.createPostHint)),
       );
       return;
     }
@@ -45,13 +49,13 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
       await DBHelper().insertPost({
         'userId': user['id'],
         'content': _contentController.text,
-        'imagePath': _imageUrlController.text.isEmpty ? null : _imageUrlController.text,
+        'imagePath': _selectedPhotoPath,
         'timestamp': DateTime.now().toIso8601String(),
       });
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('¡Post creado exitosamente!')),
+          SnackBar(content: Text(localization.success)),
         );
         Navigator.of(context).pop(true);
       }
@@ -68,11 +72,28 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
     }
   }
 
+  Future<void> _navigateToPhotoPicker() async {
+    final result = await Navigator.of(context).push<String>(
+      MaterialPageRoute(
+        builder: (context) => PhotoPickerScreen(
+          onPhotoSelected: (photoPath) {
+            setState(() => _selectedPhotoPath = photoPath);
+          },
+        ),
+      ),
+    );
+    if (result != null) {
+      setState(() => _selectedPhotoPath = result);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final localization = AppLocalizations.of(context);
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Crear Post'),
+        title: Text(localization.createPostTitle),
         centerTitle: true,
         elevation: 0,
         flexibleSpace: Container(
@@ -89,7 +110,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
         ),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          tooltip: 'Volver',
+          tooltip: localization.back,
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
@@ -146,7 +167,7 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               controller: _contentController,
               maxLines: 8,
               decoration: InputDecoration(
-                hintText: '¿Qué estás pensando?',
+                hintText: localization.createPostHint,
                 hintStyle: TextStyle(color: Colors.grey[400]),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
@@ -164,28 +185,50 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
               ),
             ),
             const SizedBox(height: 24),
-            // Campo de ruta de imagen
-            TextField(
-              controller: _imageUrlController,
-              decoration: InputDecoration(
-                hintText: 'Ruta de la imagen (opcional)',
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                prefixIcon: const Icon(Icons.image_outlined),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
+            // Botón para seleccionar foto
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: _navigateToPhotoPicker,
+                icon: const Icon(Icons.camera_alt),
+                label: Text(localization.createPostUploadPhoto),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.purple.shade600,
-                    width: 2,
-                  ),
-                ),
-                filled: true,
-                fillColor: Colors.grey[50],
               ),
             ),
+            // Vista previa de la foto seleccionada
+            if (_selectedPhotoPath != null) ...[
+              const SizedBox(height: 16),
+              Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: Colors.grey[300]!),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: Image.file(
+                    File(_selectedPhotoPath!),
+                    height: 200,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: TextButton.icon(
+                  onPressed: () => setState(() => _selectedPhotoPath = null),
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Eliminar foto'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.red,
+                  ),
+                ),
+              ),
+            ],
             const SizedBox(height: 32),
             // Botón de crear post
             SizedBox(
@@ -209,9 +252,9 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                           valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                         ),
                       )
-                    : const Text(
-                        'Publicar',
-                        style: TextStyle(
+                    : Text(
+                        localization.createPostPost,
+                        style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                           color: Colors.white,

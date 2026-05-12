@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import '../services/preferences_service.dart';
 import '../database/db_helper.dart';
 import '../models/user.dart';
+import '../localization/app_localizations.dart';
 import 'feed_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   final ThemeNotifier? themeNotifier;
+  final LanguageNotifier? languageNotifier;
 
-  const LoginScreen({super.key, this.themeNotifier});
+  const LoginScreen({
+    super.key,
+    this.themeNotifier,
+    this.languageNotifier,
+  });
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -69,6 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
           builder: (context) => FeedScreen(
             username: username,
             themeNotifier: widget.themeNotifier ?? ThemeNotifier(ThemeMode.system),
+            languageNotifier: widget.languageNotifier ?? LanguageNotifier(AppLanguage.spanish),
           ),
         ),
       );

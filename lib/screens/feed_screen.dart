@@ -3,6 +3,7 @@ import '../database/db_helper.dart';
 import '../models/post.dart';
 import '../widgets/post_card.dart';
 import '../services/preferences_service.dart';
+import '../localization/app_localizations.dart';
 import 'login_screen.dart';
 import 'create_post_screen.dart';
 import 'settings_screen.dart';
@@ -10,11 +11,13 @@ import 'settings_screen.dart';
 class FeedScreen extends StatefulWidget {
   final String username;
   final ThemeNotifier themeNotifier;
+  final LanguageNotifier languageNotifier;
 
   const FeedScreen({
     super.key,
     required this.username,
     required this.themeNotifier,
+    required this.languageNotifier,
   });
 
   @override
@@ -56,7 +59,12 @@ class _FeedScreenState extends State<FeedScreen> {
     await PreferencesService.clearAll();
     if (mounted) {
       Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        MaterialPageRoute(
+          builder: (context) => LoginScreen(
+            themeNotifier: widget.themeNotifier,
+            languageNotifier: widget.languageNotifier,
+          ),
+        ),
         (route) => false,
       );
     }
@@ -105,6 +113,7 @@ class _FeedScreenState extends State<FeedScreen> {
                 MaterialPageRoute(
                   builder: (context) => SettingsScreen(
                     themeNotifier: widget.themeNotifier,
+                    languageNotifier: widget.languageNotifier,
                   ),
                 ),
               );

@@ -6,6 +6,7 @@ import 'screens/login_screen.dart';
 import 'screens/feed_screen.dart';
 import 'services/preferences_service.dart';
 import 'database/db_helper.dart';
+import 'localization/app_localizations.dart';
 
 void main() {
   if (kIsWeb) {
@@ -23,16 +24,24 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late ThemeNotifier _themeNotifier;
+  late LanguageNotifier _languageNotifier;
 
   @override
   void initState() {
     super.initState();
     _initTheme();
+    _initLanguage();
   }
 
   Future<void> _initTheme() async {
     final savedTheme = await PreferencesService.getThemeMode();
     _themeNotifier = ThemeNotifier(savedTheme);
+    setState(() {});
+  }
+
+  Future<void> _initLanguage() async {
+    final savedLanguage = await PreferencesService.getLanguage();
+    _languageNotifier = LanguageNotifier(savedLanguage);
     setState(() {});
   }
 
@@ -43,30 +52,48 @@ class _MyAppState extends State<MyApp> {
     return ValueListenableBuilder<ThemeMode>(
       valueListenable: _themeNotifier,
       builder: (context, themeMode, _) {
-        return MaterialApp(
-          title: 'InstaDAM',
-          theme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.light,
-            primarySwatch: Colors.blue,
-            appBarTheme: const AppBarTheme(
-              elevation: 0,
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black87,
-            ),
-          ),
-          darkTheme: ThemeData(
-            useMaterial3: true,
-            brightness: Brightness.dark,
-            primarySwatch: Colors.blue,
-            appBarTheme: AppBarTheme(
-              elevation: 0,
-              backgroundColor: Colors.grey[900],
-              foregroundColor: Colors.white,
-            ),
-          ),
-          themeMode: themeMode,
-          home: AuthWrapper(themeNotifier: _themeNotifier),
+        return ValueListenableBuilder<AppLanguage>(
+          valueListenable: _languageNotifier,
+          builder: (context, language, _) {
+            return MaterialApp(
+              title: 'InstaDAM',
+              localizationsDelegates: [
+                AppLocalizationsDelegate(language: language),
+              ],
+              supportedLocales: const [
+                Locale('es'),
+                Locale('ca'),
+                Locale('en'),
+                Locale('fr'),
+              ],
+              locale: language.locale,
+              theme: ThemeData(
+                useMaterial3: true,
+                brightness: Brightness.light,
+                primarySwatch: Colors.blue,
+                appBarTheme: const AppBarTheme(
+                  elevation: 0,
+                  backgroundColor: Colors.white,
+                  foregroundColor: Colors.black87,
+                ),
+              ),
+              darkTheme: ThemeData(
+                useMaterial3: true,
+                brightness: Brightness.dark,
+                primarySwatch: Colors.blue,
+                appBarTheme: AppBarTheme(
+                  elevation: 0,
+                  backgroundColor: Colors.grey[900],
+                  foregroundColor: Colors.white,
+                ),
+              ),
+              themeMode: themeMode,
+              home: AuthWrapper(
+                themeNotifier: _themeNotifier,
+                languageNotifier: _languageNotifier,
+              ),
+            );
+          },
         );
       },
     );
@@ -75,8 +102,13 @@ class _MyAppState extends State<MyApp> {
 
 class AuthWrapper extends StatefulWidget {
   final ThemeNotifier themeNotifier;
+  final LanguageNotifier languageNotifier;
 
-  const AuthWrapper({super.key, required this.themeNotifier});
+  const AuthWrapper({
+    super.key,
+    required this.themeNotifier,
+    required this.languageNotifier,
+  });
 
   @override
   State<AuthWrapper> createState() => _AuthWrapperState();
@@ -164,13 +196,20 @@ class _AuthWrapperState extends State<AuthWrapper> {
                 return FeedScreen(
                   username: userSnapshot.data!,
                   themeNotifier: widget.themeNotifier,
+                  languageNotifier: widget.languageNotifier,
                 );
               }
-              return LoginScreen(themeNotifier: widget.themeNotifier);
+              return LoginScreen(
+                themeNotifier: widget.themeNotifier,
+                languageNotifier: widget.languageNotifier,
+              );
             },
           );
         }
-        return LoginScreen(themeNotifier: widget.themeNotifier);
+        return LoginScreen(
+          themeNotifier: widget.themeNotifier,
+          languageNotifier: widget.languageNotifier,
+        );
       },
     );
   }
