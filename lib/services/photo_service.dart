@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
@@ -15,13 +16,18 @@ class PhotoService {
 
   /// Captura una foto usando la cámara
   Future<String?> takePhoto() async {
+    if (kIsWeb) {
+      print('Photo capture no disponible en web');
+      return null;
+    }
+
     try {
       final XFile? photo = await _imagePicker.pickImage(
         source: ImageSource.camera,
       );
 
       if (photo != null) {
-        return await _savePhoto(File(photo.path));
+        return await _savePhotoFromXFile(photo);
       }
       return null;
     } catch (e) {
@@ -32,13 +38,18 @@ class PhotoService {
 
   /// Selecciona una foto de la galería
   Future<String?> pickPhotoFromGallery() async {
+    if (kIsWeb) {
+      print('Selección de galería no disponible en web');
+      return null;
+    }
+
     try {
       final XFile? photo = await _imagePicker.pickImage(
         source: ImageSource.gallery,
       );
 
       if (photo != null) {
-        return await _savePhoto(File(photo.path));
+        return await _savePhotoFromXFile(photo);
       }
       return null;
     } catch (e) {
@@ -48,25 +59,20 @@ class PhotoService {
   }
 
   /// Guarda la foto en el directorio de la aplicación
-  Future<String> _savePhoto(File sourceFile) async {
+  Future<String> _savePhotoFromXFile(XFile sourceFile) async {
     try {
       final Directory appDir = await getApplicationDocumentsDirectory();
-      final String photoDir = '${appDir.path}/photos';
-      
-      // Crear directorio si no existe
+      final String photoDir = path.join(appDir.path, 'photos');
       final Directory photoDirFile = Directory(photoDir);
       if (!await photoDirFile.exists()) {
         await photoDirFile.create(recursive: true);
       }
 
-      // Generar nombre único para la foto
-      final String fileName =
-          'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
+      final String fileName = 'photo_${DateTime.now().millisecondsSinceEpoch}.jpg';
       final String filePath = path.join(photoDir, fileName);
-
-      // Copiar archivo a la ubicación permanente
-      final File savedFile = await sourceFile.copy(filePath);
-      
+      final File savedFile = File(filePath);
+      final bytes = await sourceFile.readAsBytes();
+      await savedFile.writeAsBytes(bytes, flush: true);
       return savedFile.path;
     } catch (e) {
       print('Error al guardar foto: $e');
@@ -76,6 +82,10 @@ class PhotoService {
 
   /// Obtiene todas las fotos guardadas
   Future<List<String>> getSavedPhotos() async {
+    if (kIsWeb) {
+      return [];
+    }
+
     try {
       final Directory appDir = await getApplicationDocumentsDirectory();
       final String photoDir = '${appDir.path}/photos';
@@ -106,6 +116,10 @@ class PhotoService {
 
   /// Elimina una foto guardada
   Future<bool> deletePhoto(String filePath) async {
+    if (kIsWeb) {
+      return false;
+    }
+
     try {
       final File file = File(filePath);
       if (await file.exists()) {

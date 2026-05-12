@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import '../models/post.dart';
@@ -18,12 +19,19 @@ class DBHelper {
   }
 
   Future<Database> _initDatabase() async {
-    String path = join(await getDatabasesPath(), 'instadam.db');
+    final String path = await _getDatabasePath('instadam.db');
     return await openDatabase(
       path,
       version: 1,
       onCreate: _onCreate,
     );
+  }
+
+  Future<String> _getDatabasePath(String fileName) async {
+    if (kIsWeb) {
+      return fileName;
+    }
+    return join(await getDatabasesPath(), fileName);
   }
 
   Future<void> _onCreate(Database db, int version) async {

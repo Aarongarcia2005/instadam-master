@@ -1,3 +1,8 @@
+import 'dart:io';
+
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import '../models/post.dart';
@@ -130,6 +135,77 @@ class _PostCardState extends State<PostCard> {
     }
   }
 
+  Widget _buildPostImage(String? imagePath) {
+    if (imagePath == null || imagePath.isEmpty) {
+      return Center(
+        child: ExcludeSemantics(
+          child: Icon(
+            Icons.image_not_supported,
+            size: 80,
+            color: Colors.grey[400],
+          ),
+        ),
+      );
+    }
+
+    final trimmedPath = imagePath.trim();
+
+    if (!kIsWeb) {
+      final file = File(trimmedPath);
+      if (file.existsSync()) {
+        return Image.file(
+          file,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: ExcludeSemantics(
+                child: Icon(
+                  Icons.image_not_supported,
+                  size: 80,
+                  color: Colors.grey[400],
+                ),
+              ),
+            );
+          },
+        );
+      }
+    }
+
+    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
+      return Image.network(
+        trimmedPath,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Center(
+            child: ExcludeSemantics(
+              child: Icon(
+                Icons.image_not_supported,
+                size: 80,
+                color: Colors.grey[400],
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    return Image.asset(
+      trimmedPath,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return Center(
+          child: ExcludeSemantics(
+            child: Icon(
+              Icons.image_not_supported,
+              size: 80,
+              color: Colors.grey[400],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   String _formatDate(String timestamp) {
     try {
       DateTime dateTime = DateTime.parse(timestamp);
@@ -207,32 +283,7 @@ class _PostCardState extends State<PostCard> {
                     width: double.infinity,
                     height: 300,
                     color: Colors.grey[300],
-                    child: widget.post.imagePath != null &&
-                            widget.post.imagePath!.isNotEmpty
-                        ? Image.asset(
-                            widget.post.imagePath!,
-                            fit: BoxFit.cover,
-                            errorBuilder: (context, error, stackTrace) {
-                              return Center(
-                                child: ExcludeSemantics(
-                                  child: Icon(
-                                    Icons.image_not_supported,
-                                    size: 80,
-                                    color: Colors.grey[400],
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        : Center(
-                            child: ExcludeSemantics(
-                              child: Icon(
-                                Icons.image_not_supported,
-                                size: 80,
-                                color: Colors.grey[400],
-                              ),
-                            ),
-                          ),
+                    child: _buildPostImage(widget.post.imagePath),
                   ),
                 ),
               ),

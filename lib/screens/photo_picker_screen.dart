@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import '../services/photo_service.dart';
@@ -45,9 +46,11 @@ class _PhotoPickerScreenState extends State<PhotoPickerScreen> {
           ),
         ),
       ),
-      body: _selectedPhotoPath == null
-          ? _buildPhotoOptions(context, localization)
-          : _buildPhotoPreview(context, localization),
+      body: kIsWeb
+          ? _buildWebNotSupported(context, localization)
+          : _selectedPhotoPath == null
+              ? _buildPhotoOptions(context, localization)
+              : _buildPhotoPreview(context, localization),
     );
   }
 
@@ -184,6 +187,7 @@ class _PhotoPickerScreenState extends State<PhotoPickerScreen> {
   }
 
   Future<void> _takePhoto() async {
+    if (kIsWeb) return;
     final photoPath = await _photoService.takePhoto();
     if (photoPath != null && mounted) {
       setState(() => _selectedPhotoPath = photoPath);
@@ -191,6 +195,7 @@ class _PhotoPickerScreenState extends State<PhotoPickerScreen> {
   }
 
   Future<void> _pickFromGallery() async {
+    if (kIsWeb) return;
     final photoPath = await _photoService.pickPhotoFromGallery();
     if (photoPath != null && mounted) {
       setState(() => _selectedPhotoPath = photoPath);
@@ -198,6 +203,7 @@ class _PhotoPickerScreenState extends State<PhotoPickerScreen> {
   }
 
   Future<void> _showSavedPhotos() async {
+    if (kIsWeb) return;
     final photos = await _photoService.getSavedPhotos();
     if (!mounted) return;
 
@@ -241,6 +247,33 @@ class _PhotoPickerScreenState extends State<PhotoPickerScreen> {
             child: const Text('Cerrar'),
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildWebNotSupported(BuildContext context, AppLocalizations localization) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.block, size: 72, color: Colors.grey),
+            const SizedBox(height: 24),
+            Text(
+              'La selección de fotos no está disponible en web.',
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: Theme.of(context).colorScheme.onBackground,
+                  ),
+            ),
+            const SizedBox(height: 24),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(localization.back),
+            ),
+          ],
+        ),
       ),
     );
   }

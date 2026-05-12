@@ -72,23 +72,89 @@ class _MyAppState extends State<MyApp> {
               locale: language.locale,
               theme: ThemeData(
                 useMaterial3: true,
-                brightness: Brightness.light,
-                primarySwatch: Colors.blue,
-                appBarTheme: const AppBarTheme(
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.purple,
+                  brightness: Brightness.light,
+                ),
+                scaffoldBackgroundColor: Colors.grey[50],
+                cardColor: Colors.white,
+                appBarTheme: AppBarTheme(
                   elevation: 0,
                   backgroundColor: Colors.white,
                   foregroundColor: Colors.black87,
+                  iconTheme: const IconThemeData(color: Colors.black87),
                 ),
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  hintStyle: TextStyle(color: Colors.grey[600]),
+                  labelStyle: TextStyle(color: Colors.grey[900]),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Colors.purple.shade600,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                textTheme: Typography.blackMountainView.copyWith(
+                  bodyLarge: const TextStyle(color: Colors.black87),
+                  bodyMedium: const TextStyle(color: Colors.black87),
+                  bodySmall: const TextStyle(color: Colors.black87),
+                  titleLarge: const TextStyle(color: Colors.black87),
+                ),
+                iconTheme: const IconThemeData(color: Colors.black87),
               ),
               darkTheme: ThemeData(
                 useMaterial3: true,
-                brightness: Brightness.dark,
-                primarySwatch: Colors.blue,
+                colorScheme: ColorScheme.fromSeed(
+                  seedColor: Colors.purple,
+                  brightness: Brightness.dark,
+                ),
+                scaffoldBackgroundColor: Colors.grey[900],
+                cardColor: Colors.grey[850],
                 appBarTheme: AppBarTheme(
                   elevation: 0,
                   backgroundColor: Colors.grey[900],
                   foregroundColor: Colors.white,
+                  iconTheme: const IconThemeData(color: Colors.white),
                 ),
+                inputDecorationTheme: InputDecorationTheme(
+                  filled: true,
+                  fillColor: Colors.grey[800],
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  labelStyle: TextStyle(color: Colors.white70),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[700]!),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[700]!),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Colors.purple.shade200,
+                      width: 2,
+                    ),
+                  ),
+                ),
+                textTheme: Typography.whiteMountainView.copyWith(
+                  bodyLarge: const TextStyle(color: Colors.white),
+                  bodyMedium: const TextStyle(color: Colors.white),
+                  bodySmall: const TextStyle(color: Colors.white70),
+                  titleLarge: const TextStyle(color: Colors.white),
+                ),
+                iconTheme: const IconThemeData(color: Colors.white),
               ),
               themeMode: themeMode,
               home: AuthWrapper(
