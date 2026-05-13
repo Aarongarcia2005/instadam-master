@@ -1,13 +1,10 @@
-import 'dart:io';
-
-import 'dart:io';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/semantics.dart';
 import '../models/post.dart';
 import '../database/db_helper.dart';
 import '../screens/comments_screen.dart';
+import '../utils/image_provider_helper.dart';
 
 class PostCard extends StatefulWidget {
   final Post post;
@@ -148,49 +145,8 @@ class _PostCardState extends State<PostCard> {
       );
     }
 
-    final trimmedPath = imagePath.trim();
-
-    if (!kIsWeb) {
-      final file = File(trimmedPath);
-      if (file.existsSync()) {
-        return Image.file(
-          file,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return Center(
-              child: ExcludeSemantics(
-                child: Icon(
-                  Icons.image_not_supported,
-                  size: 80,
-                  color: Colors.grey[400],
-                ),
-              ),
-            );
-          },
-        );
-      }
-    }
-
-    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
-      return Image.network(
-        trimmedPath,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Center(
-            child: ExcludeSemantics(
-              child: Icon(
-                Icons.image_not_supported,
-                size: 80,
-                color: Colors.grey[400],
-              ),
-            ),
-          );
-        },
-      );
-    }
-
-    return Image.asset(
-      trimmedPath,
+    return Image(
+      image: getImageProvider(imagePath),
       fit: BoxFit.cover,
       errorBuilder: (context, error, stackTrace) {
         return Center(

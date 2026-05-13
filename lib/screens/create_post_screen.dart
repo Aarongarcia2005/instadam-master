@@ -1,8 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'dart:io';
 import '../database/db_helper.dart';
 import '../localization/app_localizations.dart';
+import '../utils/image_provider_helper.dart';
 import 'photo_picker_screen.dart';
 
 class CreatePostScreen extends StatefulWidget {
@@ -74,15 +74,6 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
   }
 
   Future<void> _navigateToPhotoPicker() async {
-    if (kIsWeb) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('La selección de fotos no está disponible en web')),
-        );
-      }
-      return;
-    }
-
     final result = await Navigator.of(context).push<String>(
       MaterialPageRoute(
         builder: (context) => PhotoPickerScreen(
@@ -104,51 +95,20 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
 
     final String trimmedPath = _selectedPhotoPath!.trim();
 
-    if (!kIsWeb) {
-      final File file = File(trimmedPath);
-      if (file.existsSync()) {
-        return Image.file(
-          file,
-          height: 200,
-          width: double.infinity,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) {
-            return const Center(
-              child: Icon(
-                Icons.image_not_supported,
-                size: 80,
-                color: Colors.grey,
-              ),
-            );
-          },
+    return Image(
+      image: getImageProvider(trimmedPath),
+      height: 200,
+      width: double.infinity,
+      fit: BoxFit.cover,
+      errorBuilder: (context, error, stackTrace) {
+        return const Center(
+          child: Icon(
+            Icons.image_not_supported,
+            size: 80,
+            color: Colors.grey,
+          ),
         );
-      }
-    }
-
-    if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
-      return Image.network(
-        trimmedPath,
-        height: 200,
-        width: double.infinity,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return const Center(
-            child: Icon(
-              Icons.image_not_supported,
-              size: 80,
-              color: Colors.grey,
-            ),
-          );
-        },
-      );
-    }
-
-    return Center(
-      child: Text(
-        'No se puede mostrar esta imagen en web',
-        textAlign: TextAlign.center,
-        style: Theme.of(context).textTheme.bodyMedium,
-      ),
+      },
     );
   }
 
