@@ -271,30 +271,36 @@ class _CommentsScreenState extends State<CommentsScreen> {
             child: Row(
               children: [
                 Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    enabled: !_isSubmitting,
-                    maxLines: null,
-                    decoration: InputDecoration(
-                      hintText: localization.commentsHint,
-                      hintStyle: TextStyle(color: Colors.grey[400]),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(color: Colors.grey[300]!),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(24),
-                        borderSide: BorderSide(
-                          color: Colors.purple.shade600,
-                          width: 2,
+                  child: Semantics(
+                    textField: true,
+                    label: localization.commentsHint,
+                    hint: localization.commentsHint,
+                    child: TextField(
+                      controller: _commentController,
+                      enabled: !_isSubmitting,
+                      maxLines: null,
+                      decoration: InputDecoration(
+                        labelText: localization.commentsHint,
+                        hintText: localization.commentsHint,
+                        hintStyle: TextStyle(color: Colors.grey[400]),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
                         ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(
+                            color: Colors.purple.shade600,
+                            width: 2,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
+                        ),
+                        filled: true,
+                        fillColor: Colors.grey[50],
                       ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                      filled: true,
-                      fillColor: Colors.grey[50],
                     ),
                   ),
                 ),
@@ -303,6 +309,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   backgroundColor: _isSubmitting
                       ? Colors.grey[400]
                       : Colors.pink.shade500,
+                  child: Semantics(
+                  button: true,
+                  label: localization.commentsSend,
                   child: IconButton(
                     icon: _isSubmitting
                         ? const SizedBox(
@@ -322,6 +331,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                     tooltip: localization.commentsSend,
                     onPressed: _isSubmitting ? null : _submitComment,
                   ),
+                ),
                 ),
               ],
             ),

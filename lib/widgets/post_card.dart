@@ -302,9 +302,9 @@ class _PostCardState extends State<PostCard> {
                     ),
                     Semantics(
                       button: true,
-                      label: 'Comentarios',
+                      label: 'Ver comentarios',
                       value: '$commentCount ${commentCount == 1 ? "comentario" : "comentarios"}',
-                      hint: 'Doble toque para abrir comentarios',
+                      hint: 'Doble toque para abrir los comentarios de esta publicación',
                       onTap: () async {
                         final result = await Navigator.of(context).push<bool>(
                           MaterialPageRoute(
@@ -314,50 +314,46 @@ class _PostCardState extends State<PostCard> {
                             ),
                           ),
                         );
-                        // Si se agregó un comentario, recargar el conteo
                         if (result == true && mounted) {
                           _updateCommentCount();
                         }
                       },
-                      child: ExcludeSemantics(
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () async {
-                              final result = await Navigator.of(context).push<bool>(
-                                MaterialPageRoute(
-                                  builder: (context) => CommentsScreen(
-                                    post: widget.post,
-                                    currentUsername: widget.currentUsername,
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          onTap: () async {
+                            final result = await Navigator.of(context).push<bool>(
+                              MaterialPageRoute(
+                                builder: (context) => CommentsScreen(
+                                  post: widget.post,
+                                  currentUsername: widget.currentUsername,
+                                ),
+                              ),
+                            );
+                            if (result == true && mounted) {
+                              _updateCommentCount();
+                            }
+                          },
+                          borderRadius: BorderRadius.circular(8),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  Icons.comment_outlined,
+                                  color: Colors.grey[700],
+                                  size: 22,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Ver comentarios ($commentCount)',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.w500,
                                   ),
                                 ),
-                              );
-                              // Si se agregó un comentario, recargar el conteo
-                              if (result == true && mounted) {
-                                _updateCommentCount();
-                              }
-                            },
-                            borderRadius: BorderRadius.circular(8),
-                            child: Padding(
-                              padding: const EdgeInsets.all(8),
-                              child: Row(
-                                children: [
-                                  Icon(
-                                    Icons.comment_outlined,
-                                    color: Colors.grey[700],
-                                    size: 22,
-                                  ),
-                                  const SizedBox(width: 4),
-                                  Text(
-                                    'Ver comentarios ($commentCount)',
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[700],
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ],
-                              ),
+                              ],
                             ),
                           ),
                         ),

@@ -121,6 +121,16 @@ class DBHelper {
     return await db.insert('posts', post);
   }
 
+  Future<int> updatePost(int id, Map<String, dynamic> values) async {
+    Database db = await database;
+    return await db.update(
+      'posts',
+      values,
+      where: 'id = ?',
+      whereArgs: [id],
+    );
+  }
+
   Future<List<Post>> getPostsByUsername(String username) async {
     Database db = await database;
     List<Map<String, dynamic>> result = await db.rawQuery('''

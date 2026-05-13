@@ -188,38 +188,48 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             ),
             const SizedBox(height: 24),
             // Campo de texto para el contenido
-            TextField(
-              controller: _contentController,
-              maxLines: 8,
-              decoration: InputDecoration(
-                hintText: localization.createPostHint,
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(color: Colors.grey[300]!),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide(
-                    color: Colors.purple.shade600,
-                    width: 2,
+            Semantics(
+              textField: true,
+              label: localization.createPostHint,
+              hint: localization.createPostHint,
+              child: TextField(
+                controller: _contentController,
+                maxLines: 8,
+                decoration: InputDecoration(
+                  labelText: localization.createPostHint,
+                  hintText: localization.createPostHint,
+                  hintStyle: TextStyle(color: Colors.grey[400]),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(color: Colors.grey[300]!),
                   ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                    borderSide: BorderSide(
+                      color: Colors.purple.shade600,
+                      width: 2,
+                    ),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[50],
                 ),
-                filled: true,
-                fillColor: Colors.grey[50],
               ),
             ),
             const SizedBox(height: 24),
             // Botón para seleccionar foto
             SizedBox(
               width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _navigateToPhotoPicker,
-                icon: const Icon(Icons.camera_alt),
-                label: Text(localization.createPostUploadPhoto),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: const EdgeInsets.symmetric(vertical: 12),
+              child: Semantics(
+                button: true,
+                label: '${localization.createPostUploadPhoto}. Pulsa para seleccionar una foto.',
+                child: ElevatedButton.icon(
+                  onPressed: _navigateToPhotoPicker,
+                  icon: const Icon(Icons.camera_alt),
+                  label: Text(localization.createPostUploadPhoto),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                  ),
                 ),
               ),
             ),
@@ -231,20 +241,28 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(color: Colors.grey[300]!),
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(12),
-                  child: _buildSelectedPhotoPreview(),
+                child: Semantics(
+                  image: true,
+                  label: 'Imagen seleccionada para la publicación',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: _buildSelectedPhotoPreview(),
+                  ),
                 ),
               ),
               const SizedBox(height: 12),
               SizedBox(
                 width: double.infinity,
-                child: TextButton.icon(
-                  onPressed: () => setState(() => _selectedPhotoPath = null),
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Eliminar foto'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: Colors.red,
+                child: Semantics(
+                  button: true,
+                  label: 'Eliminar imagen seleccionada',
+                  child: TextButton.icon(
+                    onPressed: () => setState(() => _selectedPhotoPath = null),
+                    icon: const Icon(Icons.delete),
+                    label: const Text('Eliminar foto'),
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.red,
+                    ),
                   ),
                 ),
               ),
@@ -254,32 +272,36 @@ class _CreatePostScreenState extends State<CreatePostScreen> {
             SizedBox(
               width: double.infinity,
               height: 50,
-              child: ElevatedButton(
-                onPressed: _isLoading ? null : _createPost,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.pink.shade500,
-                  disabledBackgroundColor: Colors.grey[300],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+              child: Semantics(
+                button: true,
+                label: '${localization.createPostPost}. Pulsa para publicar tu mensaje.',
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _createPost,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.pink.shade500,
+                    disabledBackgroundColor: Colors.grey[300],
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                   ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          localization.createPostPost,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
-                child: _isLoading
-                    ? const SizedBox(
-                        height: 24,
-                        width: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                        ),
-                      )
-                    : Text(
-                        localization.createPostPost,
-                        style: const TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
               ),
             ),
           ],

@@ -217,27 +217,49 @@ class _AuthWrapperState extends State<AuthWrapper> {
           // Insertar posts de ejemplo
           await dbHelper.insertPost({
             'userId': demoUserId,
-            'content': 'Primer post INSTADAM ',
-            'imagePath': 'https://s2.abcstatics.com/media/sociedad/2016/02/24/sindrome-down-anciano--620x349.jpg',
+            'content': 'Primer post INSTADAM',
+            'imagePath': 'https://picsum.photos/seed/instadam1/900/500',
             'timestamp': DateTime.now().subtract(const Duration(days: 2)).toIso8601String(),
           });
           
           await dbHelper.insertPost({
             'userId': demoUserId,
-            'content': 'Segundo post INSTADAM ',
-            'imagePath': 'assets/imagen2.png',
+            'content': 'Segundo post INSTADAM',
+            'imagePath': 'https://picsum.photos/seed/instadam2/900/500',
             'timestamp': DateTime.now().subtract(const Duration(days: 1)).toIso8601String(),
           });
           
           await dbHelper.insertPost({
             'userId': demoUserId,
             'content': 'Tercer post INSTADAM 🦽',
-            'imagePath': 'assets/imagen3.png',
+            'imagePath': 'https://picsum.photos/seed/instadam3/900/500',
             'timestamp': DateTime.now().toIso8601String(),
           });
         }
       } catch (e) {
         debugPrint('Error inicializando datos de ejemplo: $e');
+      }
+    } else {
+      try {
+        for (var post in posts) {
+          final String? imagePath = post['imagePath'] as String?;
+          if (imagePath != null && imagePath.startsWith('assets/')) {
+            final int id = post['id'] as int;
+            String newImagePath = 'https://picsum.photos/seed/instadam_default_$id/900/500';
+
+            if (post['content'] == 'Primer post INSTADAM') {
+              newImagePath = 'https://picsum.photos/seed/instadam1/900/500';
+            } else if (post['content'] == 'Segundo post INSTADAM') {
+              newImagePath = 'https://picsum.photos/seed/instadam2/900/500';
+            } else if (post['content'] == 'Tercer post INSTADAM 🦽') {
+              newImagePath = 'https://picsum.photos/seed/instadam3/900/500';
+            }
+
+            await dbHelper.updatePost(id, {'imagePath': newImagePath});
+          }
+        }
+      } catch (e) {
+        debugPrint('Error migrando rutas de imagen antiguas: $e');
       }
     }
   }

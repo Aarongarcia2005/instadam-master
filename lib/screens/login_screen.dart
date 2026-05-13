@@ -149,12 +149,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      'INSTA-DAM',
-                      style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                    Semantics(
+                      header: true,
+                      label: 'InstaDAM',
+                      child: const Text(
+                        'INSTA-DAM',
+                        style: TextStyle(
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.blue,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 8),
